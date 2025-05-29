@@ -91,69 +91,105 @@ st.set_page_config(page_title="Rekomendasi Tanaman", page_icon="🌿", layout="w
 st.title("🌿 Sistem Rekomendasi Tanaman Cerdas 🌿")
 st.markdown("""
 Aplikasi ini menggunakan model Random Forest yang dibangun "dari scratch" untuk merekomendasikan
-tanaman yang cocok berdasarkan kondisi tanah dan lingkungan. Masukkan parameter di bawah ini:
+tanaman yang cocok berdasarkan kondisi tanah dan lingkungan. Silakan geser slider di bawah ini:
 """)
 
-# FEATURE_ORDER = ['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall'] # Pastikan ini ada
-
 col1, col2 = st.columns(2)
+
 with col1:
     st.subheader("Parameter Tanah:")
-    N = st.number_input('Kadar Nitrogen (N) (kg/ha)', min_value=0, max_value=200, value=90, key="N_input")
-    P = st.number_input('Kadar Fosfor (P) (kg/ha)', min_value=0, max_value=150, value=40, key="P_input")
-    K = st.number_input('Kadar Kalium (K) (kg/ha)', min_value=0, max_value=210, value=40, key="K_input")
-    ph = st.number_input('Tingkat pH Tanah', min_value=0.0, max_value=14.0, value=6.5, format="%.2f", key="ph_input")
+    # Nama variabel (N, P, K, ph) harus sama dengan yang digunakan saat membuat input_features
+    N = st.slider(
+        'Kadar Nitrogen (N) (kg/ha)', 
+        min_value=0, 
+        max_value=150,  # Sesuaikan max_value berdasarkan data trainingmu
+        value=90,       # Nilai default awal
+        step=1          # Kenaikan per geseran
+    )
+    P = st.slider(
+        'Kadar Fosfor (P) (kg/ha)', 
+        min_value=0, 
+        max_value=150,  # Sesuaikan max_value
+        value=45, 
+        step=1
+    )
+    K = st.slider(
+        'Kadar Kalium (K) (kg/ha)', 
+        min_value=0, 
+        max_value=210,  # Sesuaikan max_value
+        value=45, 
+        step=1
+    )
+    ph = st.slider(
+        'Tingkat pH Tanah', 
+        min_value=3.0,  # Sesuaikan min_value dan max_value
+        max_value=10.0, 
+        value=6.5, 
+        step=0.1,       # Step untuk nilai desimal
+        format="%.1f"   # Format tampilan nilai slider
+    )
 
 with col2:
     st.subheader("Parameter Lingkungan:")
-    temperature = st.number_input('Suhu (°C)', min_value=-10.0, max_value=60.0, value=25.0, format="%.2f", key="temp_input")
-    humidity = st.number_input('Kelembapan (%)', min_value=0.0, max_value=100.0, value=70.0, format="%.2f", key="hum_input")
-    rainfall = st.number_input('Curah Hujan (mm)', min_value=0.0, max_value=350.0, value=150.0, format="%.2f", key="rain_input")
+    temperature = st.slider(
+        'Suhu (°C)', 
+        min_value=5.0,   # Sesuaikan min_value dan max_value
+        max_value=45.0, 
+        value=25.0, 
+        step=0.5,
+        format="%.1f"
+    )
+    humidity = st.slider(
+        'Kelembapan (%)', 
+        min_value=10.0,  # Sesuaikan min_value dan max_value
+        max_value=100.0, 
+        value=70.0, 
+        step=1.0,
+        format="%.1f"
+    )
+    rainfall = st.slider(
+        'Curah Hujan (mm)', 
+        min_value=20.0,  # Sesuaikan min_value dan max_value
+        max_value=300.0, 
+        value=100.0, 
+        step=5.0,        # Step bisa lebih besar untuk curah hujan
+        format="%.1f"
+    )
 
-if st.button('💡 Dapatkan Rekomendasi Tanaman', key="predict_button"):
+# Tombol untuk membuat prediksi (logika prediksi tetap sama)
+if st.button('💡 Dapatkan Rekomendasi Tanaman', key="predict_button_slider"): # Ganti key jika perlu
     if loaded_rf_model_scratch is not None and loaded_label_encoder is not None:
+        # Kumpulkan input dalam urutan yang benar
         input_features = np.array([[N, P, K, temperature, humidity, ph, rainfall]], dtype=float)
+        
         try:
-            # Gunakan fungsi yang sudah dimodifikasi
             numeric_prediction, confidence = predict_random_forest_with_confidence(loaded_rf_model_scratch, input_features)
-
             crop_name_prediction = loaded_label_encoder.inverse_transform(numeric_prediction)
 
             st.markdown("---")
             st.subheader("✔️ Rekomendasi Untuk Anda:")
             
-            # Cara 1: Menggunakan st.metric untuk tampilan yang lebih menonjol
             col_pred, col_conf = st.columns(2)
             with col_pred:
                 st.metric(label="Tanaman Direkomendasikan", value=crop_name_prediction[0])
             with col_conf:
                 st.metric(label="Tingkat Keyakinan (Voting)", value=f"{confidence[0]:.2f}%")
-
-            # Cara 2: Menggunakan st.success dengan format lebih besar (opsional, bisa dikombinasikan atau pilih salah satu)
-            # st.success(f"## **Tanaman yang paling cocok adalah: {crop_name_prediction[0]}**")
-            # st.info(f"**Tingkat Keyakinan (Persentase Voting): {confidence[0]:.2f}%**")
-
-            # Cara 3: Menggunakan Markdown untuk kustomisasi (lebih advanced jika ingin styling CSS)
-            # st.markdown(f"""
-            # <div style="background-color: #28a745; color: white; padding: 15px; border-radius: 7px; text-align: center;">
-            #     <h2>Rekomendasi: {crop_name_prediction[0]}</h2>
-            #     <p style="font-size: 1.2em;">Tingkat Keyakinan (Voting): {confidence[0]:.2f}%</p>
-            # </div>
-            # """, unsafe_allow_html=True)
-
-            if confidence[0] > 75: # Beri emoji berdasarkan confidence
-                st.balloons()
-            elif confidence[0] > 50:
-                st.success("👍")
-            else:
-                st.warning("🤔 Model kurang yakin dengan rekomendasi ini, pertimbangkan variasi input.")
-
+            
+            # Hapus atau sesuaikan bagian emoji ini jika diinginkan
+            # if confidence[0] > 75:
+            #     st.balloons()
+            # elif confidence[0] > 50:
+            #     st.info("Rekomendasi cukup baik.")
+            # else:
+            #     st.warning("Model kurang yakin dengan rekomendasi ini.")
 
         except Exception as e:
             st.error(f"Terjadi kesalahan saat melakukan prediksi: {e}")
+            st.error("Pastikan fungsi `predict_tree` dan `predict_random_forest_with_confidence` dari scratch sudah benar.")
     else:
         st.error("Model atau encoder tidak berhasil dimuat. Aplikasi tidak bisa melakukan prediksi.")
 
+# ... (Bagian footer tetap sama) ...
 st.markdown("---")
 st.markdown("Proyek Akhir Mata Kuliah AI | Model Klasifikasi Random Forest dari Scratch")
 st.markdown(f"Waktu saat ini: {pd.Timestamp.now(tz='Asia/Jakarta').strftime('%A, %d %B %Y, %H:%M:%S %Z')}") # WIB Time
