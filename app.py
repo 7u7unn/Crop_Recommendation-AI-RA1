@@ -5,15 +5,8 @@ import pickle
 import joblib
 from collections import Counter # Diperlukan oleh fungsi predict_random_forest_with_confidence
 
-# --- BAGIAN 1: DEFINISIKAN KEMBALI FUNGSI PREDIKSI DARI SCRATCH ---
-# PENTING: Ganti `predict_random_forest` dengan `predict_random_forest_with_confidence`
-# dan pastikan implementasi `predict_tree` juga ada di sini.
-
 def predict_tree(tree_node, x_row):
-    """
-    SALIN IMPLEMENTASI FUNGSI predict_tree DARI SCRATCH MILIKMU KE SINI.
-    (Sama seperti yang sudah kamu letakkan di app.py sebelumnya)
-    """
+
     if tree_node.get('is_leaf', False):
         return tree_node['leaf_value']
     feature_idx = tree_node.get('feature_idx')
@@ -24,9 +17,7 @@ def predict_tree(tree_node, x_row):
         return predict_tree(tree_node['right'], x_row)
 
 def predict_random_forest_with_confidence(list_of_trees, X_input_data):
-    """
-    SALIN IMPLEMENTASI FUNGSI predict_random_forest_with_confidence YANG BARU (DARI ATAS) KE SINI.
-    """
+
     if X_input_data.ndim == 1:
         X_input_data = X_input_data.reshape(1, -1)
     n_samples = X_input_data.shape[0]
@@ -90,7 +81,7 @@ st.set_page_config(page_title="Rekomendasi Tanaman", page_icon="🌿", layout="w
 
 st.title("🌿 Sistem Rekomendasi Tanaman Cerdas 🌿")
 st.markdown("""
-Aplikasi ini menggunakan model Random Forest yang dibangun "dari scratch" untuk merekomendasikan
+Aplikasi ini menggunakan model Random Forest yang dibangun untuk merekomendasikan
 tanaman yang cocok berdasarkan kondisi tanah dan lingkungan. Silakan geser slider di bawah ini:
 """)
 
@@ -173,7 +164,7 @@ if st.button('💡 Dapatkan Rekomendasi Tanaman', key="predict_button_slider"): 
             with col_pred:
                 st.metric(label="Tanaman Direkomendasikan", value=crop_name_prediction[0])
             with col_conf:
-                st.metric(label="Tingkat Keyakinan (Voting)", value=f"{confidence[0]:.2f}%")
+                st.metric(label="confidence", value=f"{confidence[0]:.2f}%")
             
             # Hapus atau sesuaikan bagian emoji ini jika diinginkan
             # if confidence[0] > 75:
