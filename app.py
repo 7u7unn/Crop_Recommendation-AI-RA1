@@ -164,7 +164,7 @@ if st.button('💡 Dapatkan Rekomendasi Tanaman', key="predict_button_slider"): 
             with col_pred:
                 st.metric(label="Tanaman Direkomendasikan", value=crop_name_prediction[0])
             with col_conf:
-                st.metric(label="confidence", value=f"{confidence[0]:.2f}%")
+                st.metric(label="CONFIDENCE", value=f"{confidence[0]:.2f}%")
             
             # Hapus atau sesuaikan bagian emoji ini jika diinginkan
             # if confidence[0] > 75:
