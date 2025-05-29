@@ -1,6 +1,7 @@
 import streamlit as st
 st.set_page_config(page_title="Rekomendasi Tanaman", page_icon="🌿", layout="wide")
 import numpy as np
+import pandas as pd
 import pickle
 import joblib
 from collections import Counter 
