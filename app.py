@@ -1,38 +1,23 @@
 import streamlit as st
 st.set_page_config(page_title="Rekomendasi Tanaman", page_icon="🌿", layout="wide")
 import numpy as np
-import pandas as pd  # Digunakan untuk membuat DataFrame input jika diperlukan, atau untuk referensi nama fitur
 import pickle
 import joblib
-from collections import Counter # Diperlukan oleh fungsi predict_random_forest dari scratch
+from collections import Counter 
 
-# --- BAGIAN 1: DEFINISIKAN KEMBALI FUNGSI PREDIKSI DARI SCRATCH ---
-# PENTING: Salin fungsi `predict_tree` dan `predict_random_forest`
-# yang telah kamu buat untuk model "dari scratch" ke sini.
-# Model .pkl yang kamu muat akan bergantung pada fungsi-fungsi ini.
 
 def predict_tree(tree_node, x_row):
-    """
-    SALIN IMPLEMENTASI FUNGSI predict_tree DARI SCRATCH MILIKMU KE SINI.
-    Contoh struktur dasar (sesuaikan dengan implementasimu):
-    """
-    if tree_node.get('is_leaf', False): # Gunakan .get() untuk keamanan jika key tidak ada
+
+    if tree_node.get('is_leaf', False): 
         return tree_node['leaf_value']
 
     feature_idx = tree_node.get('feature_idx')
     threshold = tree_node.get('threshold')
 
     if feature_idx is None or threshold is None:
-        # Handle kasus di mana node tidak valid atau leaf tanpa flag 'is_leaf'
-        # Ini seharusnya tidak terjadi jika pohon dibangun dengan benar, tapi sebagai pengaman
+        
         st.error("Error pada struktur pohon: node internal tanpa fitur/threshold.")
-        # Kembalikan prediksi default atau raise error, tergantung bagaimana kamu ingin menanganinya
-        # Untuk sekarang, kita asumsikan tidak terjadi jika pohon benar.
-        # Jika ini leaf implisit karena tidak ada split bagus, seharusnya ditandai 'is_leaf':True
-        # dengan leaf_value saat build_tree.
-        # Jika masih sampai sini, berarti ada yang salah saat build/save.
-        # Kita bisa coba ambil kelas mayoritas dari root jika ada info sampel, tapi itu kompleks.
-        # Untuk sementara, kita anggap pohon valid.
+
         pass # Hapus pass dan pastikan logic tree traversalmu benar
 
     if x_row[feature_idx] <= threshold:
@@ -41,10 +26,7 @@ def predict_tree(tree_node, x_row):
         return predict_tree(tree_node['right'], x_row)
 
 def predict_random_forest(list_of_trees, X_input_data):
-    """
-    SALIN IMPLEMENTASI FUNGSI predict_random_forest DARI SCRATCH MILIKMU KE SINI.
-    Contoh struktur dasar (sesuaikan dengan implementasimu):
-    """
+   
     if X_input_data.ndim == 1:
         X_input_data = X_input_data.reshape(1, -1)
 
@@ -63,11 +45,10 @@ def predict_random_forest(list_of_trees, X_input_data):
 
     return final_aggregated_predictions
 
-# --- BAGIAN 2: MUAT MODEL DAN ENCODER (DENGAN CACHING STREAMLIT) ---
-MODEL_FILENAME = 'rf_scratch_model.pkl'  # Nama file model .pkl mu
-ENCODER_FILENAME = 'crop_label_encoder_for_scratch.joblib' # Nama file encoder .joblib mu
+MODEL_FILENAME = 'rf_scratch_model.pkl'  
+ENCODER_FILENAME = 'crop_label_encoder_for_scratch.joblib' 
 
-# Menggunakan @st.cache_resource untuk memuat model sekali saja
+# Menggunakan @st.cache_resource untuk memuat model
 @st.cache_resource
 def load_model_from_file(model_path):
     try:
@@ -97,17 +78,15 @@ def load_encoder_from_file(encoder_path):
 loaded_rf_model_scratch = load_model_from_file(MODEL_FILENAME)
 loaded_label_encoder = load_encoder_from_file(ENCODER_FILENAME)
 
-# --- BAGIAN 3: ANTARMUKA PENGGUNA STREAMLIT ---
 
 
 st.title("🌿 Sistem Rekomendasi Tanaman Cerdas 🌿")
 st.markdown("""
-Aplikasi ini menggunakan model Random Forest yang dibangun "dari scratch" untuk merekomendasikan
+Aplikasi ini menggunakan model Random Forest yang dibangun untuk merekomendasikan
 tanaman yang cocok berdasarkan kondisi tanah dan lingkungan. Masukkan parameter di bawah ini:
 """)
 
-# Daftar fitur sesuai urutan saat training modelmu
-# Sesuaikan nama dan urutan ini!
+
 FEATURE_ORDER = ['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall']
 
 # Buat kolom untuk layout yang lebih rapi
@@ -131,9 +110,7 @@ if st.button('💡 Dapatkan Rekomendasi Tanaman'):
     if loaded_rf_model_scratch is not None and loaded_label_encoder is not None:
         # Kumpulkan input dalam urutan yang benar
         input_features = np.array([[N, P, K, temperature, humidity, ph, rainfall]], dtype=float)
-        # Pastikan input_features memiliki nama kolom yang sama dan urutan yang sama
-        # dengan data yang digunakan saat training jika modelmu sensitif terhadap ini
-        # (model dari scratch mungkin tidak menyimpan nama fitur, jadi urutan sangat penting).
+
 
         try:
             # Buat prediksi numerik menggunakan model dari scratch
