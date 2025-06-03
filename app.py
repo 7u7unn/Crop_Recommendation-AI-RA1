@@ -11,7 +11,7 @@ import joblib
 
 # --- BAGIAN 2: MUAT MODEL SCIKIT-LEARN DAN ENCODER ---
 SKLEARN_MODEL_FILENAME = 'sklearn_rf_model.joblib'  # Nama file model .joblib scikit-learn
-ENCODER_FILENAME = 'crop_label_encoder_for_scratch.joblib' # atau nama file encoder-mu
+ENCODER_FILENAME = 'crop_label_encoder_for_scratch(2).joblib' # atau nama file encoder-mu
 
 @st.cache_resource
 def load_sklearn_model_from_file(model_path):
