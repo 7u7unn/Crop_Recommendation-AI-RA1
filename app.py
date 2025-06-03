@@ -74,7 +74,28 @@ if st.button('💡 Dapatkan Rekomendasi (Scikit-learn)', key="predict_sklearn_bu
             probabilities = loaded_sklearn_rf_model.predict_proba(input_features)
             # Confidence adalah probabilitas maksimum dari kelas yang diprediksi
             confidence = np.max(probabilities, axis=1) * 100
+            numeric_prediction = loaded_sklearn_rf_model.predict(input_features)
+            probabilities = loaded_sklearn_rf_model.predict_proba(input_features)
+            confidence = np.max(probabilities, axis=1) * 100
 
+            # --- TAMBAHKAN DEBUGGING DI SINI ---
+            st.subheader("🔍 INFORMASI DEBUGGING:")
+            if loaded_label_encoder is not None:
+                st.write("**Kelas yang diketahui oleh LabelEncoder (Streamlit):**")
+                st.write(list(loaded_label_encoder.classes_)) # Ini HARUS nama tanaman string
+                st.write(f"**Jumlah kelas yang diketahui encoder:** {len(loaded_label_encoder.classes_)}")
+            else:
+                st.error("**DEBUG: LabelEncoder TIDAK DIMUAT!**")
+
+            st.write("**Prediksi Numerik Mentah dari Model (Streamlit):**")
+            st.write(numeric_prediction) # Ini HARUS array berisi satu angka, misal [18]
+            if isinstance(numeric_prediction, np.ndarray) and numeric_prediction.ndim == 1:
+                st.write(f"**Nilai numerik tunggal yang diprediksi:** {numeric_prediction[0]}")
+            st.write("--- AKHIR DEBUGGING ---")
+            # --- SELESAI DEBUGGING ---
+
+            # Baris yang berpotensi error:
+            crop_name_prediction = loaded_label_encoder.inverse_transform(numeric_prediction)
             crop_name_prediction = loaded_label_encoder.inverse_transform(numeric_prediction)
 
             st.markdown("---")
