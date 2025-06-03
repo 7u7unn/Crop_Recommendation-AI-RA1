@@ -63,47 +63,60 @@ with col2:
     humidity = st.slider('Kelembapan (%)', 10.0, 100.0, 70.0, 1.0, format="%.1f", key="hum_sl")
     rainfall = st.slider('Curah Hujan (mm)', 20.0, 300.0, 100.0, 5.0, format="%.1f", key="rain_sl")
 
+# ... (kode di atasnya sudah oke) ...
+
 if st.button('💡 Dapatkan Rekomendasi (Scikit-learn)', key="predict_sklearn_button"):
     if loaded_sklearn_rf_model is not None and loaded_label_encoder is not None:
         input_features = np.array([[N, P, K, temperature, humidity, ph, rainfall]], dtype=float)
         try:
-            # Gunakan metode .predict() dari model scikit-learn
-            numeric_prediction = loaded_sklearn_rf_model.predict(input_features)
+            # 1. DAPATKAN PREDIKSI NUMERIK (CUKUP SEKALI)
+            numeric_prediction = loaded_sklearn_rf_model.predict(input_features) # Output: array([angka_kelas])
 
-            # Gunakan metode .predict_proba() untuk confidence
-            probabilities = loaded_sklearn_rf_model.predict_proba(input_features)
-            # Confidence adalah probabilitas maksimum dari kelas yang diprediksi
-            confidence = np.max(probabilities, axis=1) * 100
-            numeric_prediction = loaded_sklearn_rf_model.predict(input_features)
-            probabilities = loaded_sklearn_rf_model.predict_proba(input_features)
-            confidence = np.max(probabilities, axis=1) * 100
+            # 2. DAPATKAN PROBABILITAS/CONFIDENCE (CUKUP SEKALI)
+            probabilities = loaded_sklearn_rf_model.predict_proba(input_features) # Output: array([[p0, p1, ..., pk]])
+            confidence = np.max(probabilities, axis=1) * 100 # Ambil probabilitas tertinggi -> array([confidence_value])
 
-            # --- TAMBAHKAN DEBUGGING DI SINI ---
+            # --- KESALAHAN ADA DI BAGIAN INI ---
+            # numeric_prediction = loaded_sklearn_rf_model.predict(input_features) # INI DUPLIKAT, TIDAK PERLU
+            # probabilities = loaded_sklearn_rf_model.predict_proba(input_features) # INI DUPLIKAT, TIDAK PERLU
+            # confidence = np.max(probabilities, axis=1) * 100 # INI DUPLIKAT, TIDAK PERLU
+
+            # --- PERBAIKI BAGIAN INI ---
+            # crop_name_prediction = numeric_prediction[0] # Ini akan memberikan ANGKA kelas, bukan nama
+            # crop_name_prediction = confidence # Ini salah, crop_name_prediction harusnya NAMA TANAMAN
+
+            # SEHARUSNYA: Ubah prediksi numerik menjadi nama tanaman menggunakan LabelEncoder
+            # Pastikan loaded_label_encoder adalah objek LabelEncoder yang sudah di-fit
+            if isinstance(numeric_prediction, np.ndarray) and numeric_prediction.size > 0:
+                crop_name_prediction_str = loaded_label_encoder.inverse_transform(numeric_prediction) # Hasilnya array string
+            else:
+                st.error("Prediksi numerik tidak valid.")
+                st.stop() # Hentikan eksekusi jika prediksi tidak valid
+            # --- SELESAI PERBAIKAN ---
+
+
+            # --- DEBUGGING YANG DIKOMENTARI (Bagus untuk disimpan jika ada masalah lagi) ---
             # st.subheader("🔍 INFORMASI DEBUGGING:")
             # if loaded_label_encoder is not None:
             #     st.write("**Kelas yang diketahui oleh LabelEncoder (Streamlit):**")
-            #     st.write(list(loaded_label_encoder.classes_)) # Ini HARUS nama tanaman string
+            #     st.write(list(loaded_label_encoder.classes_))
             #     st.write(f"**Jumlah kelas yang diketahui encoder:** {len(loaded_label_encoder.classes_)}")
             # else:
             #     st.error("**DEBUG: LabelEncoder TIDAK DIMUAT!**")
-
             # st.write("**Prediksi Numerik Mentah dari Model (Streamlit):**")
-            # st.write(numeric_prediction) # Ini HARUS array berisi satu angka, misal [18]
+            # st.write(numeric_prediction)
             # if isinstance(numeric_prediction, np.ndarray) and numeric_prediction.ndim == 1:
             #     st.write(f"**Nilai numerik tunggal yang diprediksi:** {numeric_prediction[0]}")
             # st.write("--- AKHIR DEBUGGING ---")
-            # # --- SELESAI DEBUGGING ---
 
-            # Baris yang berpotensi error:
-            crop_name_prediction = numeric_prediction[0]
-            crop_name_prediction = confidence
 
             st.markdown("---")
             st.subheader("✔️ Rekomendasi Untuk Anda (Model Scikit-learn):")
 
             col_pred, col_conf = st.columns(2)
             with col_pred:
-                st.metric(label="Tanaman Direkomendasikan", value=crop_name_prediction[0])
+                # Tampilkan nama tanaman string hasil inverse_transform
+                st.metric(label="Tanaman Direkomendasikan", value=crop_name_prediction_str[0]) 
             with col_conf:
                 st.metric(label="Tingkat Keyakinan (Probabilitas)", value=f"{confidence[0]:.2f}%")
 
@@ -112,8 +125,12 @@ if st.button('💡 Dapatkan Rekomendasi (Scikit-learn)', key="predict_sklearn_bu
 
         except Exception as e:
             st.error(f"Terjadi kesalahan saat melakukan prediksi dengan model Scikit-learn: {e}")
+            import traceback # Tambahkan ini untuk melihat traceback lengkap jika ada error tak terduga
+            st.text(traceback.format_exc())
     else:
         st.error("Model Scikit-learn atau encoder tidak berhasil dimuat.")
+
+# ... (Footer tetap sama) ...
 
 # ... (Footer tetap sama) ...
 st.markdown("---")
