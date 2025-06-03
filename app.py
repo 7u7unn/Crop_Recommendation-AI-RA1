@@ -95,7 +95,7 @@ if st.button('💡 Dapatkan Rekomendasi (Scikit-learn)', key="predict_sklearn_bu
             # # --- SELESAI DEBUGGING ---
 
             # Baris yang berpotensi error:
-            crop_name_prediction = numeric_prediction
+            crop_name_prediction = numeric_prediction[0]
             crop_name_prediction = confidence
 
             st.markdown("---")
