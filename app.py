@@ -50,18 +50,28 @@ if st.button('💡 Dapatkan Rekomendasi (Scikit-learn)'):
             prediction = loaded_sklearn_rf_model.predict(input_features)
             probabilities = loaded_sklearn_rf_model.predict_proba(input_features)
             confidence = np.max(probabilities, axis=1) * 100
+            crop = prediction[0]
+            conf = confidence[0]
 
+            # st.markdown("---")
+            # st.subheader("✔️ Rekomendasi Untuk Anda (Model Scikit-learn):")
+
+            # col_pred, col_conf = st.columns(2)
+            # with col_pred:
+            #     st.metric(label="Tanaman Direkomendasikan", value=prediction[0])
+            # with col_conf:
+            #     st.metric(label="Tingkat Keyakinan (Probabilitas)", value=f"{confidence[0]:.2f}%")
+
+            # if confidence[0] > 75:
+            #     st.balloons()
+
+            st.toast(f"✅ Tanaman direkomendasikan: **{crop}** (Keyakinan: {conf:.2f}%)", icon="🌱")
+
+            # Blok hasil utama
             st.markdown("---")
-            st.subheader("✔️ Rekomendasi Untuk Anda (Model Scikit-learn):")
+            st.subheader("🌿 Rekomendasi Tanaman:")
 
-            col_pred, col_conf = st.columns(2)
-            with col_pred:
-                st.metric(label="Tanaman Direkomendasikan", value=prediction[0])
-            with col_conf:
-                st.metric(label="Tingkat Keyakinan (Probabilitas)", value=f"{confidence[0]:.2f}%")
-
-            if confidence[0] > 75:
-                st.balloons()
+            st.success(f"🌾 **{crop}** adalah tanaman yang paling cocok untuk kondisi tanah dan lingkungan ini.\n\n📊 Keyakinan model: **{conf:.2f}%**")
 
         except Exception as e:
             st.error(f"Terjadi kesalahan saat melakukan prediksi: {e}")
