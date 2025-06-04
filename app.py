@@ -43,6 +43,61 @@ with col2:
     humidity = st.slider('Kelembapan (%)', 10.0, 100.0, 70.0, 1.0, format="%.1f")
     rainfall = st.slider('Curah Hujan (mm)', 20.0, 300.0, 100.0, 5.0, format="%.1f")
 
+import random
+
+# Dataset referensi (21 baris seperti yang kamu berikan)
+example_data = [
+    [94, 53, 40, 20.28, 82.89, 5.72, 241.97, 'rice'],
+    [74, 55, 19, 18.05, 62.89, 6.29, 84.24, 'maize'],
+    [35, 66, 81, 19.37, 15.77, 6.14, 85.25, 'chickpea'],
+    [37, 64, 22, 17.48, 18.83, 5.95, 121.94, 'kidneybeans'],
+    [39, 77, 21, 23.00, 60.24, 4.60, 159.69, 'pigeonpeas'],
+    [11, 44, 17, 26.34, 55.59, 8.02, 35.11, 'mothbeans'],
+    [27, 56, 20, 29.21, 87.11, 6.42, 51.54, 'mungbean'],
+    [58, 61, 15, 30.95, 64.23, 7.40, 62.79, 'blackgram'],
+    [10, 56, 18, 28.00, 68.64, 7.33, 46.11, 'lentil'],
+    [12, 29, 40, 19.68, 89.75, 6.59, 111.28, 'pomegranate'],
+    [82, 78, 46, 25.06, 84.97, 5.74, 110.44, 'banana'],
+    [26, 37, 30, 35.40, 49.46, 6.17, 97.41, 'mango'],
+    [33, 120, 205, 35.12, 82.27, 5.55, 69.72, 'grapes'],
+    [92, 20, 55, 25.10, 87.53, 6.59, 59.27, 'watermelon'],
+    [80, 18, 52, 27.87, 91.15, 6.48, 24.05, 'muskmelon'],
+    [12, 129, 205, 22.36, 91.16, 6.12, 118.68, 'apple'],
+    [15, 14, 8, 10.01, 90.22, 6.22, 119.39, 'orange'],
+    [57, 57, 51, 39.02, 91.49, 6.99, 105.88, 'papaya'],
+    [27, 10, 33, 27.81, 97.48, 6.47, 154.06, 'coconut'],
+    [111, 39, 22, 22.60, 80.35, 6.14, 88.57, 'cotton'],
+    [61, 41, 44, 24.37, 82.11, 6.54, 159.92, 'jute']
+]
+
+def generate_random_example():
+    base = random.choice(example_data)
+    def vary(val, percent=0.1):
+        return round(val + val * random.uniform(-percent, percent), 2)
+    return {
+        'N': int(vary(base[0], 0.15)),
+        'P': int(vary(base[1], 0.15)),
+        'K': int(vary(base[2], 0.15)),
+        'temperature': vary(base[3], 0.05),
+        'humidity': vary(base[4], 0.05),
+        'ph': vary(base[5], 0.05),
+        'rainfall': vary(base[6], 0.10),
+        'label': base[7]
+    }
+
+if st.button("🎲 Generate Contoh Acak"):
+    example = generate_random_example()
+    N = example['N']
+    P = example['P']
+    K = example['K']
+    temperature = example['temperature']
+    humidity = example['humidity']
+    ph = example['ph']
+    rainfall = example['rainfall']
+    
+    st.toast(f"Contoh acak untuk label **{example['label']}** dimuat ke slider.", icon="🧪")
+
+
 if st.button('💡 Dapatkan Rekomendasi (Scikit-learn)'):
     if loaded_sklearn_rf_model is not None:
         input_features = np.array([[N, P, K, temperature, humidity, ph, rainfall]], dtype=float)
