@@ -147,4 +147,4 @@ if st.button('💡 Dapatkan Rekomendasi'):
 
 # Footer
 st.markdown("---")
-st.markdown("Proyek Akhir Mata Kuliah AI | Model Klasifikasi Random Forest Scikit-learn")
+st.markdown("Proyek Akhir Mata Kuliah AI | Model Klasifikasi Random Forest")
