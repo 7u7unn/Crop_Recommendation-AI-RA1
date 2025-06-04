@@ -2,7 +2,7 @@ import streamlit as st
 import numpy as np
 import joblib
 
-st.set_page_config(page_title="Rekomendasi Tanaman (Scikit-learn)", page_icon="🌿", layout="wide")
+st.set_page_config(page_title="Sistem Rekomendasi Tanaman Berbasis Random Forest", page_icon="🌿", layout="wide")
 
 # Nama file model
 SKLEARN_MODEL_FILENAME = 'sklearn_rf_model.joblib'
@@ -23,10 +23,10 @@ def load_sklearn_model_from_file(model_path):
 loaded_sklearn_rf_model = load_sklearn_model_from_file(SKLEARN_MODEL_FILENAME)
 
 # UI
-st.title("🌿 Sistem Rekomendasi Tanaman (Scikit-learn) 🌿")
+st.title("🌿 Sistem Rekomendasi Tanaman Berbasis Random Forest 🌿")
 st.markdown("""
-Aplikasi ini menggunakan model Random Forest dari Scikit-learn untuk merekomendasikan
-tanaman yang cocok. Masukkan parameter di bawah ini:
+Aplikasi ini menggunakan model Random Forest untuk merekomendasikan
+tanaman yang cocok sesuai karakteristik tanah. Masukkan parameter di bawah ini:
 """)
 
 col1, col2 = st.columns(2)
@@ -69,9 +69,16 @@ if st.button('💡 Dapatkan Rekomendasi (Scikit-learn)'):
 
             # Blok hasil utama
             st.markdown("---")
-            st.subheader("🌿 Rekomendasi Tanaman:")
+            st.markdown(f"""
+            <div style="background-color:#004d00;padding:20px;border-radius:10px">
+                <h2 style="color:white;text-align:center;">🌾 Rekomendasi Utama: <span style="color:#FFD700;">{crop.upper()}</span></h2>
+                <p style="color:white;text-align:center;font-size:18px;">
+                    Tanaman ini adalah yang paling cocok untuk kondisi tanah dan lingkungan yang Anda masukkan.
+                </p>
+                <h4 style="color:#90EE90;text-align:center;">📊 Keyakinan Model: {conf:.2f}%</h4>
+            </div>
+            """, unsafe_allow_html=True)
 
-            st.success(f"🌾 **{crop}** adalah tanaman yang paling cocok untuk kondisi tanah dan lingkungan ini.\n\n📊 Keyakinan model: **{conf:.2f}%**")
 
         except Exception as e:
             st.error(f"Terjadi kesalahan saat melakukan prediksi: {e}")
