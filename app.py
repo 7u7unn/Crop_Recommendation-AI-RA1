@@ -28,20 +28,31 @@ st.markdown("""
 Aplikasi ini menggunakan model Random Forest untuk merekomendasikan
 tanaman yang cocok sesuai karakteristik tanah. Masukkan parameter di bawah ini:
 """)
+for key, default in {
+    "N": 90,
+    "P": 45,
+    "K": 45,
+    "ph": 6.5,
+    "temperature": 25.0,
+    "humidity": 70.0,
+    "rainfall": 100.0,
+}.items():
+    if key not in st.session_state:
+        st.session_state[key] = default
 
 col1, col2 = st.columns(2)
 with col1:
     st.subheader("Parameter Tanah:")
-    N = st.slider('Kadar Nitrogen (N) (kg/ha)', 0, 150, 90, 1, key="N")
-    P = st.slider('Kadar Fosfor (P) (kg/ha)', 0, 150, 45, 1, key="P")
-    K = st.slider('Kadar Kalium (K) (kg/ha)', 0, 210, 45, 1, key="K")
-    ph = st.slider('Tingkat pH Tanah', 3.0, 10.0, 6.5, 0.1, format="%.1f", key="ph")
+    N = st.slider('Kadar Nitrogen (N) (kg/ha)', 0, 150, key="N")
+    P = st.slider('Kadar Fosfor (P) (kg/ha)', 0, 150, key="P")
+    K = st.slider('Kadar Kalium (K) (kg/ha)', 0, 210, key="K")
+    ph = st.slider('Tingkat pH Tanah', 3.0, 10.0, key="ph", format="%.1f")
 
 with col2:
     st.subheader("Parameter Lingkungan:")
-    temperature = st.slider('Suhu (°C)', 5.0, 45.0, 25.0, 0.5, format="%.1f", key="temperature")
-    humidity = st.slider('Kelembapan (%)', 10.0, 100.0, 70.0, 1.0, format="%.1f", key="humidity")
-    rainfall = st.slider('Curah Hujan (mm)', 20.0, 300.0, 100.0, 5.0, format="%.1f", key="rainfall")
+    temperature = st.slider('Suhu (°C)', 5.0, 45.0, key="temperature", format="%.1f")
+    humidity = st.slider('Kelembapan (%)', 10.0, 100.0, key="humidity", format="%.1f")
+    rainfall = st.slider('Curah Hujan (mm)', 20.0, 300.0, key="rainfall", format="%.1f")
 
 import random
 
