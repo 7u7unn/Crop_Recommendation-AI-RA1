@@ -70,12 +70,7 @@ def generate_random_example():
     }
 
 # Jika tombol contoh acak ditekan, update state & rerun
-if st.button("🎲 Generate Contoh Acak"):
-    example = generate_random_example()
-    for key in ["N", "P", "K", "temperature", "humidity", "ph", "rainfall"]:
-        st.session_state[key] = example[key]
-    st.toast(f"Contoh acak untuk label **{example['label']}** dimuat ke slider.", icon="🧪")
-    st.rerun()
+
 
 # Judul dan deskripsi
 st.title("🌿 Sistem Rekomendasi Tanaman Berbasis Random Forest 🌿")
@@ -83,6 +78,12 @@ st.markdown("""
 Aplikasi ini menggunakan model Random Forest untuk merekomendasikan
 tanaman yang cocok sesuai karakteristik tanah. Masukkan parameter di bawah ini:
 """)
+if st.button("🎲 Generate Contoh Acak"):
+    example = generate_random_example()
+    for key in ["N", "P", "K", "temperature", "humidity", "ph", "rainfall"]:
+        st.session_state[key] = example[key]
+    st.toast(f"Contoh acak untuk label **{example['label']}** dimuat ke slider.", icon="🧪")
+    st.rerun()
 
 # Inisialisasi default jika belum ada di session_state
 defaults = {
