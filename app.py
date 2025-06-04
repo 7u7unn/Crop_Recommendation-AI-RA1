@@ -56,7 +56,7 @@ example_data = [
 # Fungsi untuk generate contoh acak
 def generate_random_example():
     base = random.choice(example_data)
-    def vary(val, percent=0.1):
+    def vary(val, percent=0.2):
         return round(val + val * random.uniform(-percent, percent), 2)
     return {
         'N': int(vary(base[0], 0.15)),
