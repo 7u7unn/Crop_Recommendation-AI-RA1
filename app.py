@@ -2,6 +2,8 @@ import streamlit as st
 import numpy as np
 import joblib
 
+st.set_page_config(page_title="Rekomendasi Tanaman (Scikit-learn)", page_icon="🌿", layout="wide")
+
 # Nama file model
 SKLEARN_MODEL_FILENAME = 'sklearn_rf_model.joblib'
 
@@ -21,7 +23,6 @@ def load_sklearn_model_from_file(model_path):
 loaded_sklearn_rf_model = load_sklearn_model_from_file(SKLEARN_MODEL_FILENAME)
 
 # UI
-st.set_page_config(page_title="Rekomendasi Tanaman (Scikit-learn)", page_icon="🌿", layout="wide")
 st.title("🌿 Sistem Rekomendasi Tanaman (Scikit-learn) 🌿")
 st.markdown("""
 Aplikasi ini menggunakan model Random Forest dari Scikit-learn untuk merekomendasikan
