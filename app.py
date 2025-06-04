@@ -115,7 +115,7 @@ with col2:
     rainfall = st.slider('Curah Hujan (mm)', 20.0, 300.0, value=st.session_state["rainfall"], key="rainfall", format="%.1f")
 
 # Tombol prediksi
-if st.button('💡 Dapatkan Rekomendasi (Scikit-learn)'):
+if st.button('💡 Dapatkan Rekomendasi'):
     if loaded_sklearn_rf_model is not None:
         input_features = np.array([[N, P, K, temperature, humidity, ph, rainfall]], dtype=float)
         try:
