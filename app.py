@@ -1,34 +1,34 @@
 import streamlit as st
 import numpy as np
 import joblib
+import random
 
-st.set_page_config(page_title="Sistem Rekomendasi Tanaman Berbasis Random Forest", page_icon="🌿", layout="wide")
+# Konfigurasi halaman
+st.set_page_config(
+    page_title="Sistem Rekomendasi Tanaman Berbasis Random Forest",
+    page_icon="🌿",
+    layout="wide"
+)
 
 # Nama file model
 SKLEARN_MODEL_FILENAME = 'sklearn_rf_model.joblib'
 
+# Fungsi untuk memuat model
 @st.cache_resource
 def load_sklearn_model_from_file(model_path):
     try:
-        model_data = joblib.load(model_path)
-        return model_data
+        return joblib.load(model_path)
     except FileNotFoundError:
-        st.error(f"Error: File model '{model_path}' tidak ditemukan.")
-        return None
+        st.error(f"❌ File model '{model_path}' tidak ditemukan.")
     except Exception as e:
-        st.error(f"Error saat memuat model: {e}")
-        return None
+        st.error(f"❌ Gagal memuat model: {e}")
+    return None
 
 # Muat model
 loaded_sklearn_rf_model = load_sklearn_model_from_file(SKLEARN_MODEL_FILENAME)
 
-# UI
-st.title("🌿 Sistem Rekomendasi Tanaman Berbasis Random Forest 🌿")
-st.markdown("""
-Aplikasi ini menggunakan model Random Forest untuk merekomendasikan
-tanaman yang cocok sesuai karakteristik tanah. Masukkan parameter di bawah ini:
-""")
-for key, default in {
+# Inisialisasi session_state jika belum ada
+default_values = {
     "N": 90,
     "P": 45,
     "K": 45,
@@ -36,27 +36,34 @@ for key, default in {
     "temperature": 25.0,
     "humidity": 70.0,
     "rainfall": 100.0,
-}.items():
+}
+for key, val in default_values.items():
     if key not in st.session_state:
-        st.session_state[key] = default
+        st.session_state[key] = val
 
+# Header aplikasi
+st.title("🌿 Sistem Rekomendasi Tanaman Berbasis Random Forest 🌿")
+st.markdown("""
+Masukkan parameter karakteristik tanah dan lingkungan di bawah ini untuk mendapatkan rekomendasi tanaman yang sesuai.
+""")
+
+# UI input parameter
 col1, col2 = st.columns(2)
+
 with col1:
     st.subheader("Parameter Tanah:")
-    N = st.slider('Kadar Nitrogen (N) (kg/ha)', 0, 150, key="N")
-    P = st.slider('Kadar Fosfor (P) (kg/ha)', 0, 150, key="P")
-    K = st.slider('Kadar Kalium (K) (kg/ha)', 0, 210, key="K")
-    ph = st.slider('Tingkat pH Tanah', 3.0, 10.0, key="ph", format="%.1f")
+    st.slider('Kadar Nitrogen (N) (kg/ha)', 0, 150, key="N")
+    st.slider('Kadar Fosfor (P) (kg/ha)', 0, 150, key="P")
+    st.slider('Kadar Kalium (K) (kg/ha)', 0, 210, key="K")
+    st.slider('Tingkat pH Tanah', 3.0, 10.0, key="ph", format="%.1f")
 
 with col2:
     st.subheader("Parameter Lingkungan:")
-    temperature = st.slider('Suhu (°C)', 5.0, 45.0, key="temperature", format="%.1f")
-    humidity = st.slider('Kelembapan (%)', 10.0, 100.0, key="humidity", format="%.1f")
-    rainfall = st.slider('Curah Hujan (mm)', 20.0, 300.0, key="rainfall", format="%.1f")
+    st.slider('Suhu (°C)', 5.0, 45.0, key="temperature", format="%.1f")
+    st.slider('Kelembapan (%)', 10.0, 100.0, key="humidity", format="%.1f")
+    st.slider('Curah Hujan (mm)', 20.0, 300.0, key="rainfall", format="%.1f")
 
-import random
-
-# Dataset referensi (21 baris seperti yang kamu berikan)
+# Dataset referensi
 example_data = [
     [94, 53, 40, 20.28, 82.89, 5.72, 241.97, 'rice'],
     [74, 55, 19, 18.05, 62.89, 6.29, 84.24, 'maize'],
@@ -83,8 +90,7 @@ example_data = [
 
 def generate_random_example():
     base = random.choice(example_data)
-    def vary(val, percent=0.1):
-        return round(val + val * random.uniform(-percent, percent), 2)
+    def vary(val, percent=0.1): return round(val + val * random.uniform(-percent, percent), 2)
     return {
         'N': int(vary(base[0], 0.15)),
         'P': int(vary(base[1], 0.15)),
@@ -96,44 +102,28 @@ def generate_random_example():
         'label': base[7]
     }
 
+# Tombol generate contoh acak
 if st.button("🎲 Generate Contoh Acak"):
     example = generate_random_example()
-    st.session_state["N"] = example["N"]
-    st.session_state["P"] = example["P"]
-    st.session_state["K"] = example["K"]
-    st.session_state["temperature"] = example["temperature"]
-    st.session_state["humidity"] = example["humidity"]
-    st.session_state["ph"] = example["ph"]
-    st.session_state["rainfall"] = example["rainfall"]
-
+    for key in ['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall']:
+        st.session_state[key] = example[key]
     st.toast(f"Contoh acak untuk label **{example['label']}** dimuat ke slider.", icon="🧪")
 
-
+# Tombol prediksi
 if st.button('💡 Dapatkan Rekomendasi (Scikit-learn)'):
     if loaded_sklearn_rf_model is not None:
-        input_features = np.array([[N, P, K, temperature, humidity, ph, rainfall]], dtype=float)
         try:
+            input_features = np.array([[st.session_state["N"], st.session_state["P"], st.session_state["K"],
+                                        st.session_state["temperature"], st.session_state["humidity"],
+                                        st.session_state["ph"], st.session_state["rainfall"]]])
             prediction = loaded_sklearn_rf_model.predict(input_features)
             probabilities = loaded_sklearn_rf_model.predict_proba(input_features)
-            confidence = np.max(probabilities, axis=1) * 100
+            confidence = np.max(probabilities, axis=1)[0] * 100
             crop = prediction[0]
-            conf = confidence[0]
 
-            # st.markdown("---")
-            # st.subheader("✔️ Rekomendasi Untuk Anda (Model Scikit-learn):")
+            # Tampilkan hasil
+            st.toast(f"✅ Tanaman direkomendasikan: **{crop}** (Keyakinan: {confidence:.2f}%)", icon="🌱")
 
-            # col_pred, col_conf = st.columns(2)
-            # with col_pred:
-            #     st.metric(label="Tanaman Direkomendasikan", value=prediction[0])
-            # with col_conf:
-            #     st.metric(label="Tingkat Keyakinan (Probabilitas)", value=f"{confidence[0]:.2f}%")
-
-            # if confidence[0] > 75:
-            #     st.balloons()
-
-            st.toast(f"✅ Tanaman direkomendasikan: **{crop}** (Keyakinan: {conf:.2f}%)", icon="🌱")
-
-            # Blok hasil utama
             st.markdown("---")
             st.markdown(f"""
             <div style="background-color:#004d00;padding:20px;border-radius:10px">
@@ -141,17 +131,14 @@ if st.button('💡 Dapatkan Rekomendasi (Scikit-learn)'):
                 <p style="color:white;text-align:center;font-size:18px;">
                     Tanaman ini adalah yang paling ideal untuk kondisi tanah dan lingkungan yang Anda masukkan.
                 </p>
-                <h4 style="color:#90EE90;text-align:center;">📊 Confidence: {conf:.2f}%</h4>
+                <h4 style="color:#90EE90;text-align:center;">📊 Confidence: {confidence:.2f}%</h4>
             </div>
             """, unsafe_allow_html=True)
-
-
         except Exception as e:
-            st.error(f"Terjadi kesalahan saat melakukan prediksi: {e}")
-            import traceback
-            st.text(traceback.format_exc())
+            st.error(f"❌ Terjadi kesalahan saat melakukan prediksi: {e}")
     else:
-        st.error("Model Scikit-learn tidak berhasil dimuat.")
+        st.error("Model belum dimuat.")
 
+# Footer
 st.markdown("---")
-st.markdown("Proyek Akhir Mata Kuliah AI | Model Klasifikasi Random Forest Scikit-learn")
+st.markdown("📘 Proyek Akhir Mata Kuliah AI | Model Klasifikasi Random Forest Scikit-learn")
