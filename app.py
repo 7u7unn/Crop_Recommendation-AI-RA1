@@ -32,16 +32,16 @@ tanaman yang cocok sesuai karakteristik tanah. Masukkan parameter di bawah ini:
 col1, col2 = st.columns(2)
 with col1:
     st.subheader("Parameter Tanah:")
-    N = st.slider('Kadar Nitrogen (N) (kg/ha)', 0, 150, 90, 1)
-    P = st.slider('Kadar Fosfor (P) (kg/ha)', 0, 150, 45, 1)
-    K = st.slider('Kadar Kalium (K) (kg/ha)', 0, 210, 45, 1)
-    ph = st.slider('Tingkat pH Tanah', 3.0, 10.0, 6.5, 0.1, format="%.1f")
+    N = st.slider('Kadar Nitrogen (N) (kg/ha)', 0, 150, 90, 1, key="N")
+    P = st.slider('Kadar Fosfor (P) (kg/ha)', 0, 150, 45, 1, key="P")
+    K = st.slider('Kadar Kalium (K) (kg/ha)', 0, 210, 45, 1, key="K")
+    ph = st.slider('Tingkat pH Tanah', 3.0, 10.0, 6.5, 0.1, format="%.1f", key="ph")
 
 with col2:
     st.subheader("Parameter Lingkungan:")
-    temperature = st.slider('Suhu (°C)', 5.0, 45.0, 25.0, 0.5, format="%.1f")
-    humidity = st.slider('Kelembapan (%)', 10.0, 100.0, 70.0, 1.0, format="%.1f")
-    rainfall = st.slider('Curah Hujan (mm)', 20.0, 300.0, 100.0, 5.0, format="%.1f")
+    temperature = st.slider('Suhu (°C)', 5.0, 45.0, 25.0, 0.5, format="%.1f", key="temperature")
+    humidity = st.slider('Kelembapan (%)', 10.0, 100.0, 70.0, 1.0, format="%.1f", key="humidity")
+    rainfall = st.slider('Curah Hujan (mm)', 20.0, 300.0, 100.0, 5.0, format="%.1f", key="rainfall")
 
 import random
 
@@ -87,14 +87,14 @@ def generate_random_example():
 
 if st.button("🎲 Generate Contoh Acak"):
     example = generate_random_example()
-    N = example['N']
-    P = example['P']
-    K = example['K']
-    temperature = example['temperature']
-    humidity = example['humidity']
-    ph = example['ph']
-    rainfall = example['rainfall']
-    
+    st.session_state["N"] = example["N"]
+    st.session_state["P"] = example["P"]
+    st.session_state["K"] = example["K"]
+    st.session_state["temperature"] = example["temperature"]
+    st.session_state["humidity"] = example["humidity"]
+    st.session_state["ph"] = example["ph"]
+    st.session_state["rainfall"] = example["rainfall"]
+
     st.toast(f"Contoh acak untuk label **{example['label']}** dimuat ke slider.", icon="🧪")
 
 
