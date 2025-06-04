@@ -73,9 +73,9 @@ if st.button('💡 Dapatkan Rekomendasi (Scikit-learn)'):
             <div style="background-color:#004d00;padding:20px;border-radius:10px">
                 <h2 style="color:white;text-align:center;">🌾 Rekomendasi Utama: <span style="color:#FFD700;">{crop.upper()}</span></h2>
                 <p style="color:white;text-align:center;font-size:18px;">
-                    Tanaman ini adalah yang paling cocok untuk kondisi tanah dan lingkungan yang Anda masukkan.
+                    Tanaman ini adalah yang paling ideal untuk kondisi tanah dan lingkungan yang Anda masukkan.
                 </p>
-                <h4 style="color:#90EE90;text-align:center;">📊 Keyakinan Model: {conf:.2f}%</h4>
+                <h4 style="color:#90EE90;text-align:center;">📊 Confidence: {conf:.2f}%</h4>
             </div>
             """, unsafe_allow_html=True)
 
